@@ -44,6 +44,7 @@ export interface Budget {
 }
 
 export interface UserPreferences {
+  id?: string;
   userId: string;
   defaultBudgetPeriod: BudgetPeriod;
   defaultCategories: Category[];

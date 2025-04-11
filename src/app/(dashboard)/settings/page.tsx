@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCollection } from '@/hooks/useFirestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -15,19 +15,26 @@ export default function SettingsPage() {
   const { data: preferences, loading, update, add } = 
     useCollection<UserPreferences>('preferences', user?.uid || '');
   
-  const [currency, setCurrency] = useState<string>(preferences?.[0]?.currency || 'USD');
-  const [defaultPeriod, setDefaultPeriod] = useState<string>(
-    preferences?.[0]?.defaultBudgetPeriod || 'weekly'
-  );
-  const [theme, setTheme] = useState<string>(preferences?.[0]?.theme || 'light');
+  const [currency, setCurrency] = useState<string>('USD');
+  const [defaultPeriod, setDefaultPeriod] = useState<string>('weekly');
+  const [theme, setTheme] = useState<string>('light');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Load preferences when data is available
+  useEffect(() => {
+    if (preferences && preferences.length > 0) {
+      setCurrency(preferences[0].currency || 'USD');
+      setDefaultPeriod(preferences[0].defaultBudgetPeriod || 'weekly');
+      setTheme(preferences[0].theme || 'light');
+    }
+  }, [preferences]);
 
   const handleSavePreferences = async () => {
     if (!user) return;
     
     setIsSaving(true);
     try {
-      const userPreferences = {
+      const userPreferences: Omit<UserPreferences, 'id'> = {
         userId: user.uid,
         currency,
         defaultBudgetPeriod: defaultPeriod as 'weekly' | 'bi-weekly' | 'monthly',
@@ -36,7 +43,13 @@ export default function SettingsPage() {
       };
 
       if (preferences && preferences.length > 0) {
-        await update(preferences[0].id, userPreferences);
+        // Make sure the id exists before trying to update
+        if (preferences[0].id) {
+          await update(preferences[0].id, userPreferences);
+        } else {
+          console.error('Preference found but has no ID');
+          await add(userPreferences);
+        }
       } else {
         await add(userPreferences);
       }
