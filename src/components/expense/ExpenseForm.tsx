@@ -39,7 +39,7 @@ export function ExpenseForm({ open, onClose, onSuccess, budgetId }: ExpenseFormP
     try {
       await add({
         userId: user.uid,
-        budgetId,
+        budgetId: budgetId || 'unassigned',
         categoryId: formData.categoryId,
         amount: parseFloat(formData.amount) || 0,
         date: new Date(formData.date),
