@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { getApps, initializeApp } from "firebase/app";
-import { getAuth, connectAuthEmulator, setPersistence, browserLocalPersistence, inMemoryPersistence } from "firebase/auth";
+import { getAuth, connectAuthEmulator, setPersistence, browserLocalPersistence, inMemoryPersistence, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -19,6 +19,8 @@ console.log('Firebase config loaded:', {
   authDomainExists: !!firebaseConfig.authDomain,
   projectIdExists: !!firebaseConfig.projectId,
   appIdExists: !!firebaseConfig.appId,
+  environment: process.env.NODE_ENV,
+  isPWA: typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches
 });
 
 // Initialize Firebase
@@ -38,9 +40,36 @@ const db = getFirestore(app);
 // Set persistence to LOCAL for PWA support
 // This ensures the user stays logged in even when the app is closed
 if (typeof window !== 'undefined') {
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+  console.log('App is running as PWA:', isPWA);
+  
   setPersistence(auth, browserLocalPersistence)
     .then(() => {
       console.log('Firebase persistence set to LOCAL');
+      
+      // Get stored credentials
+      const storedUser = localStorage.getItem('firebase:authUser:' + firebaseConfig.apiKey + ':[DEFAULT]');
+      console.log('Stored user credentials found:', !!storedUser);
+      
+      // Track auth state changes for debugging
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log('Auth state indicates user is signed in:', user.uid);
+          console.log('Auth persistence state:', {
+            emailVerified: user.emailVerified,
+            isAnonymous: user.isAnonymous,
+            metadata: user.metadata,
+          });
+        } else {
+          console.log('Auth state indicates no user is signed in');
+          
+          // Check if there might be stored credentials that didn't load
+          const storedUser = localStorage.getItem('firebase:authUser:' + firebaseConfig.apiKey + ':[DEFAULT]');
+          if (storedUser) {
+            console.warn('Potential persistence issue: stored credentials exist but user is not signed in');
+          }
+        }
+      });
     })
     .catch((error) => {
       console.error('Error setting persistence:', error);

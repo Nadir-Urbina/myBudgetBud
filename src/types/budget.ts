@@ -20,6 +20,8 @@ export interface BudgetItem {
 
 export interface Expense {
   id: string;
+  userId: string;
+  budgetId: string;
   categoryId: string;
   amount: number;
   date: Date;
