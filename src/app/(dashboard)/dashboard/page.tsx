@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCollection } from '@/hooks/useFirestore';
-import { Budget, Expense } from '@/types/schema';
+import { Budget, Expense } from '@/types/budget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusIcon, ArrowRightIcon, DollarSignIcon, TrendingDownIcon, PiggyBankIcon } from 'lucide-react';
@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (budgets && expenses) {
-      const totalIncome = budgets.reduce((sum, budget) => sum + (budget.amount || 0), 0);
+      const totalIncome = budgets.reduce((sum, budget) => sum + (budget.totalIncome || 0), 0);
       const totalExpenses = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
       const savings = calculateSavings(totalIncome, totalExpenses);
       
@@ -130,7 +130,7 @@ export default function DashboardPage() {
                       <p className="font-medium leading-none">{budget.name}</p>
                       <p className="text-sm text-muted-foreground">{new Date(budget.startDate).toLocaleDateString()}</p>
                     </div>
-                    <div className="font-medium">{formatCurrency(budget.amount)}</div>
+                    <div className="font-medium">{formatCurrency(budget.totalIncome)}</div>
                   </div>
                 ))}
               </div>

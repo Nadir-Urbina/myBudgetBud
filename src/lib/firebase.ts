@@ -76,18 +76,4 @@ if (typeof window !== 'undefined') {
     });
 }
 
-// Add error event listener to auth
-auth.onAuthStateChanged(
-  (user) => {
-    if (user) {
-      console.log('User is signed in:', user.uid);
-    } else {
-      console.log('No user is signed in.');
-    }
-  },
-  (error) => {
-    console.error('Auth state change error:', error);
-  }
-);
-
 export { app, auth, db }; 
