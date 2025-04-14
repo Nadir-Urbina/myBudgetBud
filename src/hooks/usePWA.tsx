@@ -26,8 +26,8 @@ export function usePWA() {
         return true;
       }
       
-      // Additional check for iOS 13+ iPad
-      if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 && !navigator.userAgentData?.mobile) {
+      // Additional check for iOS 13+ iPad (without userAgentData which causes TS errors)
+      if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
         return true;
       }
       
