@@ -12,6 +12,15 @@ const nextConfig = {
     return config;
   },
   transpilePackages: ['undici', '@firebase/auth'],
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/marketing',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig 
