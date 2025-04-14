@@ -1,36 +1,33 @@
-import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { Inter as FontSans } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { Toaster } from '@/components/ui/toaster';
+import InstallBanner from '@/components/pwa/InstallBanner';
+import PWASetup from '@/components/pwa/PWASetup';
+import { cn } from '@/lib/utils';
+import { Metadata } from 'next';
 
-const inter = Inter({
+import "./globals.css";
+
+const inter = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
+// Define metadata for better SEO and PWA support
 export const metadata: Metadata = {
-  title: "MyBudgetBud",
-  description: "Your personal budget tracking application",
-  manifest: "/manifest.json",
-  icons: {
-    icon: [
-      { url: '/icons/mainLogo.png' },
-      { url: '/icons/icon-192x192.png', sizes: '192x192' },
-      { url: '/icons/icon-512x512.png', sizes: '512x512' },
-    ],
-    apple: [
-      { url: '/icons/mainLogo.png' },
-      { url: '/icons/icon-192x192.png', sizes: '192x192' },
-    ],
+  title: 'My Budget Bud - Personal Budget Tracking',
+  description: 'Track and manage your personal finances with ease',
+  manifest: '/manifest.json',
+  themeColor: '#3b82f6',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Budget Bud',
   },
-};
-
-export const viewport: Viewport = {
-  themeColor: "#ffffff",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -39,8 +36,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
-      <body className="min-h-screen bg-background font-sans antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icons/icon.svg" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+      </head>
+      <body className={cn('min-h-screen bg-background font-sans antialiased', inter.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -49,6 +51,9 @@ export default function RootLayout({
         >
           <AuthProvider>
             {children}
+            <InstallBanner />
+            <Toaster />
+            <PWASetup />
           </AuthProvider>
         </ThemeProvider>
       </body>

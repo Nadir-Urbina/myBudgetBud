@@ -1,0 +1,70 @@
+'use client';
+
+import { Download, SmartphoneNfc } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useInstallPrompt } from '@/hooks/useInstallPrompt';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
+export function InstallAppOption() {
+  const { isStandalone, platform, canPromptInstall, promptInstall } = useInstallPrompt();
+
+  // If already installed or can't be installed, don't show the option
+  if (isStandalone || (!canPromptInstall && platform !== 'ios')) {
+    return null;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <SmartphoneNfc className="h-5 w-5" />
+          Install Budget Bud App
+        </CardTitle>
+        <CardDescription>
+          Get offline access and a better experience
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">
+          {platform === 'ios' ? (
+            <>
+              Install Budget Bud on your home screen for quick access and improved performance. This app works offline and feels like a native app.
+            </>
+          ) : platform === 'android' ? (
+            <>
+              Install Budget Bud on your device to use it offline and get a better experience. You can access all your budgets even without an internet connection.
+            </>
+          ) : (
+            <>
+              Install this application on your device for a better experience. The app works offline and provides quick access to your budgets.
+            </>
+          )}
+        </p>
+      </CardContent>
+      <CardFooter>
+        {platform === 'ios' ? (
+          <div className="space-y-2 text-sm">
+            <p className="font-medium">To install on iOS:</p>
+            <ol className="ml-5 list-decimal space-y-1">
+              <li>Tap the share button in Safari</li>
+              <li>Scroll down and tap "Add to Home Screen"</li>
+              <li>Tap "Add" in the top right corner</li>
+            </ol>
+          </div>
+        ) : (
+          <Button onClick={promptInstall} className="w-full">
+            <Download className="mr-2 h-4 w-4" />
+            Install App
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
+  );
+} 
