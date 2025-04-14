@@ -2,7 +2,7 @@
 
 import { Download, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useInstallPrompt } from '@/hooks/useInstallPrompt';
+import { usePWA } from '@/hooks/usePWA';
 
 type InstallButtonProps = {
   variant?: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
@@ -15,9 +15,10 @@ export default function InstallButton({
   size = 'default',
   className = '',
 }: InstallButtonProps) {
-  const { canPromptInstall, isStandalone, promptInstall, platform } = useInstallPrompt();
+  const { isInstallable, isInstalled, isPWA, installPWA } = usePWA();
+  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent);
 
-  if (isStandalone) {
+  if (isPWA || isInstalled) {
     return (
       <Button 
         variant="outline" 
@@ -31,7 +32,7 @@ export default function InstallButton({
     );
   }
 
-  if (!canPromptInstall && platform === 'ios') {
+  if (!isInstallable && isIOS) {
     return (
       <Button 
         variant={variant} 
@@ -48,7 +49,7 @@ export default function InstallButton({
     );
   }
 
-  if (!canPromptInstall) {
+  if (!isInstallable) {
     return null;
   }
 
@@ -57,7 +58,7 @@ export default function InstallButton({
       variant={variant} 
       size={size} 
       className={className}
-      onClick={promptInstall}
+      onClick={installPWA}
     >
       <Download className="mr-2 h-4 w-4" />
       Install App

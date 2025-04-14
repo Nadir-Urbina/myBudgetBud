@@ -2,7 +2,7 @@
 
 import { Download, SmartphoneNfc } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useInstallPrompt } from '@/hooks/useInstallPrompt';
+import { usePWA } from '@/hooks/usePWA';
 import {
   Card,
   CardContent,
@@ -13,10 +13,12 @@ import {
 } from '@/components/ui/card';
 
 export function InstallAppOption() {
-  const { isStandalone, platform, canPromptInstall, promptInstall } = useInstallPrompt();
+  const { isInstallable, isInstalled, isPWA, installPWA } = usePWA();
+  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
 
   // If already installed or can't be installed, don't show the option
-  if (isStandalone || (!canPromptInstall && platform !== 'ios')) {
+  if (isPWA || isInstalled || (!isInstallable && !isIOS)) {
     return null;
   }
 
@@ -33,11 +35,11 @@ export function InstallAppOption() {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          {platform === 'ios' ? (
+          {isIOS ? (
             <>
               Install Budget Bud on your home screen for quick access and improved performance. This app works offline and feels like a native app.
             </>
-          ) : platform === 'android' ? (
+          ) : isAndroid ? (
             <>
               Install Budget Bud on your device to use it offline and get a better experience. You can access all your budgets even without an internet connection.
             </>
@@ -49,7 +51,7 @@ export function InstallAppOption() {
         </p>
       </CardContent>
       <CardFooter>
-        {platform === 'ios' ? (
+        {isIOS ? (
           <div className="space-y-2 text-sm">
             <p className="font-medium">To install on iOS:</p>
             <ol className="ml-5 list-decimal space-y-1">
@@ -59,7 +61,7 @@ export function InstallAppOption() {
             </ol>
           </div>
         ) : (
-          <Button onClick={promptInstall} className="w-full">
+          <Button onClick={installPWA} className="w-full">
             <Download className="mr-2 h-4 w-4" />
             Install App
           </Button>
