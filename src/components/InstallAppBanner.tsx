@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
 export function InstallAppBanner() {
-  const { canPromptInstall, platform, promptInstall, dismissPrompt } = useInstallPrompt();
+  const { canPromptInstall, isIOS, promptInstall } = useInstallPrompt();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -29,14 +29,14 @@ export function InstallAppBanner() {
         <div className="flex-1 mr-4">
           <p className="font-medium">Install Budget Bud</p>
           <p className="text-sm text-muted-foreground">
-            {platform === 'ios' ? 
+            {isIOS ? 
               "Add to Home Screen for the best experience" : 
               "Install our app for easier access and offline use"
             }
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {platform !== 'ios' && (
+          {!isIOS && (
             <Button 
               variant="default" 
               size="sm" 
@@ -52,7 +52,7 @@ export function InstallAppBanner() {
             variant="ghost" 
             size="icon"
             onClick={() => {
-              dismissPrompt();
+              // Just dismiss the banner
               setIsVisible(false);
             }}
           >
