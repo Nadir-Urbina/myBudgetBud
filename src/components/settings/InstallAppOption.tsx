@@ -13,12 +13,11 @@ import {
 } from '@/components/ui/card';
 
 export function InstallAppOption() {
-  const { isInstallable, isInstalled, isPWA, installPWA } = usePWA();
-  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const { isInstallable, isInstalled, isStandalone, isIOS, promptInstall } = usePWA();
   const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
 
   // If already installed or can't be installed, don't show the option
-  if (isPWA || isInstalled || (!isInstallable && !isIOS)) {
+  if (isStandalone || isInstalled || (!isInstallable && !isIOS)) {
     return null;
   }
 
@@ -61,7 +60,7 @@ export function InstallAppOption() {
             </ol>
           </div>
         ) : (
-          <Button onClick={installPWA} className="w-full">
+          <Button onClick={promptInstall} className="w-full">
             <Download className="mr-2 h-4 w-4" />
             Install App
           </Button>

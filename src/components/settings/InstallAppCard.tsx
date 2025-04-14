@@ -6,10 +6,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ArrowDown, Smartphone } from "lucide-react";
 
 export function InstallAppCard() {
-  const { isInstallable, isInstalled, isPWA, installPWA } = usePWA();
-  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const { isInstallable, isInstalled, isStandalone, isIOS, promptInstall } = usePWA();
   
-  if (isPWA || isInstalled) {
+  if (isStandalone || isInstalled) {
     return (
       <Card>
         <CardHeader>
@@ -57,7 +56,7 @@ export function InstallAppCard() {
         ) : (
           <Button 
             className="w-full" 
-            onClick={installPWA}
+            onClick={promptInstall}
             disabled={!isInstallable}
           >
             <ArrowDown className="mr-2 h-4 w-4" />

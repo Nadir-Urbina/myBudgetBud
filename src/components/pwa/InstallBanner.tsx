@@ -7,7 +7,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePWA } from '@/hooks/usePWA';
 
 function InstallBanner() {
-  const { isInstallable, isInstalled, isPWA, installPWA } = usePWA();
+  const { isInstallable, isInstalled, isStandalone, promptInstall } = usePWA();
   const [isVisible, setIsVisible] = useState(false);
   const [dismissCount, setDismissCount] = useLocalStorage<number>('pwa-banner-dismiss-count', 0);
   const [lastDismissed, setLastDismissed] = useLocalStorage<number>('pwa-banner-last-dismissed', 0);
@@ -19,7 +19,7 @@ function InstallBanner() {
     // 3. User has dismissed the banner more than 3 times
     // 4. User has dismissed the banner less than 3 days ago
     const shouldShow = 
-      !isPWA && 
+      !isStandalone && 
       !isInstalled && 
       isInstallable && 
       dismissCount < 3 && 
@@ -33,7 +33,7 @@ function InstallBanner() {
       
       return () => clearTimeout(timer);
     }
-  }, [isPWA, isInstalled, isInstallable, dismissCount, lastDismissed]);
+  }, [isStandalone, isInstalled, isInstallable, dismissCount, lastDismissed]);
   
   const handleDismiss = () => {
     setIsVisible(false);
@@ -42,7 +42,7 @@ function InstallBanner() {
   };
   
   const handleInstall = async () => {
-    const installed = await installPWA();
+    const installed = await promptInstall();
     if (installed) {
       setIsVisible(false);
     } else {

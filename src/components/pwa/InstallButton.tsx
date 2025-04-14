@@ -15,10 +15,9 @@ export default function InstallButton({
   size = 'default',
   className = '',
 }: InstallButtonProps) {
-  const { isInstallable, isInstalled, isPWA, installPWA } = usePWA();
-  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const { isInstallable, isInstalled, isStandalone, isIOS, promptInstall } = usePWA();
 
-  if (isPWA || isInstalled) {
+  if (isStandalone || isInstalled) {
     return (
       <Button 
         variant="outline" 
@@ -58,7 +57,7 @@ export default function InstallButton({
       variant={variant} 
       size={size} 
       className={className}
-      onClick={installPWA}
+      onClick={promptInstall}
     >
       <Download className="mr-2 h-4 w-4" />
       Install App
