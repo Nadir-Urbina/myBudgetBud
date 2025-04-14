@@ -12,13 +12,15 @@ import {
   Smartphone,
   Sparkles,
   Wallet,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 export default function LandingPage() {
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration errors by only rendering the page once mounted
@@ -38,7 +40,20 @@ export default function LandingPage() {
           <Wallet className="h-8 w-8 text-primary" />
           <span className="font-bold text-2xl">MyBudgetBud</span>
         </div>
+        
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-full bg-background/80 border border-border hover:bg-accent transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? (
+              <Sun size={18} className="text-yellow-400" />
+            ) : (
+              <Moon size={18} className="text-slate-700" />
+            )}
+          </button>
+          
           <Link 
             href="/signin" 
             className="text-sm font-medium hover:text-primary transition-colors"

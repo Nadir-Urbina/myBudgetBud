@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, X } from 'lucide-react';
+import { Download, X, ShareIcon } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePWA } from '@/hooks/usePWA';
 
 function InstallBanner() {
-  const { isInstallable, isInstalled, isStandalone, promptInstall } = usePWA();
+  const { isInstallable, isInstalled, isStandalone, promptInstall, isIOS } = usePWA();
   const [isVisible, setIsVisible] = useState(false);
   const [dismissCount, setDismissCount] = useLocalStorage<number>('pwa-banner-dismiss-count', 0);
   const [lastDismissed, setLastDismissed] = useLocalStorage<number>('pwa-banner-last-dismissed', 0);
@@ -15,13 +15,13 @@ function InstallBanner() {
   useEffect(() => {
     // Don't show banner if:
     // 1. App is already installed or running as PWA
-    // 2. App is not installable
+    // 2. App is not installable and not on iOS (since iOS needs manual install)
     // 3. User has dismissed the banner more than 3 times
     // 4. User has dismissed the banner less than 3 days ago
     const shouldShow = 
       !isStandalone && 
       !isInstalled && 
-      isInstallable && 
+      (isInstallable || isIOS) && 
       dismissCount < 3 && 
       (Date.now() - lastDismissed > 3 * 24 * 60 * 60 * 1000 || lastDismissed === 0);
     
@@ -33,7 +33,7 @@ function InstallBanner() {
       
       return () => clearTimeout(timer);
     }
-  }, [isStandalone, isInstalled, isInstallable, dismissCount, lastDismissed]);
+  }, [isStandalone, isInstalled, isInstallable, isIOS, dismissCount, lastDismissed]);
   
   const handleDismiss = () => {
     setIsVisible(false);
@@ -42,13 +42,14 @@ function InstallBanner() {
   };
   
   const handleInstall = async () => {
-    const installed = await promptInstall();
-    if (installed) {
+    if (isIOS) {
+      // Show iOS-specific instructions
+      alert('To install on iOS:\n\n1. Tap the share icon at the bottom of your screen\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top-right corner');
       setIsVisible(false);
     } else {
-      // If installation failed or was declined, show guidance for iOS
-      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        alert('To install this app on iOS: tap the share icon and then "Add to Home Screen"');
+      const installed = await promptInstall();
+      if (installed) {
+        setIsVisible(false);
       }
     }
   };
@@ -70,14 +71,18 @@ function InstallBanner() {
           <Download size={24} className="text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold text-sm">Install Budget Bud</h3>
-          <p className="text-xs text-muted-foreground mt-1 mb-3">Add to your home screen for a better experience</p>
+          <h3 className="font-semibold text-sm">Install MyBudgetBud</h3>
+          <p className="text-xs text-muted-foreground mt-1 mb-3">
+            {isIOS 
+              ? "Add to your home screen for offline access" 
+              : "Install for better experience and offline use"}
+          </p>
           <Button 
             size="sm" 
             onClick={handleInstall}
             className="w-full"
           >
-            Install App
+            {isIOS ? "Show Install Instructions" : "Install App"}
           </Button>
         </div>
       </div>

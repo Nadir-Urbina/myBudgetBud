@@ -17,10 +17,24 @@ export function usePWA() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Check if on iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    setIsIOS(isIOSDevice);
+    // Check if on iOS - improved detection
+    const isIOSDevice = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera || '';
+      
+      // Check for iOS devices: iPhone, iPad, iPod
+      if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+        return true;
+      }
+      
+      // Additional check for iOS 13+ iPad
+      if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 && !navigator.userAgentData?.mobile) {
+        return true;
+      }
+      
+      return false;
+    };
+    
+    setIsIOS(isIOSDevice());
 
     // Check if in standalone mode
     const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches ||
@@ -31,7 +45,7 @@ export function usePWA() {
     // PWA is supported on Chrome, Edge, Safari (iOS 11.3+), Samsung Internet, Opera, Firefox (Android)
     const isPWASupportedBrowser = 
       'serviceWorker' in navigator && 
-      'BeforeInstallPromptEvent' in window;
+      ('BeforeInstallPromptEvent' in window || isIOSDevice());
     setIsPWASupported(isPWASupportedBrowser);
 
     // Check if already installed to home screen
@@ -60,6 +74,14 @@ export function usePWA() {
     };
     
     mediaQueryList.addEventListener('change', handleChange);
+
+    // Log detection results for debugging
+    console.log('PWA Detection:', {
+      isIOS: isIOSDevice(),
+      isStandalone: isInStandaloneMode,
+      isPWASupported: isPWASupportedBrowser,
+      userAgent: navigator.userAgent
+    });
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
