@@ -27,6 +27,10 @@ export interface Expense {
   date: Date;
   notes?: string;
   tags?: string[];
+  type: 'budget' | 'actual';
+  category?: string;
+  completed?: boolean;
+  completedAt?: Date | null;
 }
 
 export interface Budget {
