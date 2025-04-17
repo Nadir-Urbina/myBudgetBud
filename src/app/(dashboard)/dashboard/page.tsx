@@ -53,7 +53,7 @@ export default function DashboardPage() {
     const savingsRate = calculateSavingsRate(totalIncome, savings);
 
     // Calculate top spending categories
-    const categoryExpenses = {};
+    const categoryExpenses: Record<string, number> = {};
     actualExpenses.forEach(expense => {
       const categoryId = expense.categoryId;
       if (!categoryId) return;
