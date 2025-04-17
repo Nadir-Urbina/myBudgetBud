@@ -1,4 +1,3 @@
-import { MainNav } from '@/components/layout/MainNav';
 import DashboardLayoutClient from '@/components/layout/DashboardLayoutClient';
 
 export default function DashboardLayout({
@@ -6,9 +5,5 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <DashboardLayoutClient>
-      {children}
-    </DashboardLayoutClient>
-  );
+  return <DashboardLayoutClient>{children}</DashboardLayoutClient>;
 } 

@@ -19,28 +19,24 @@ export function PageTransition({
   const [prevPathname, setPrevPathname] = useState(pathname);
 
   useEffect(() => {
-    // If the path changes, trigger transition
+    // If the path changes, update immediately but with animation
     if (pathname !== prevPathname) {
-      setIsTransitioning(true);
-      
-      // After animation completes, update the current children
-      const timer = setTimeout(() => {
-        setCurrentChildren(children);
-        setIsTransitioning(false);
-        setPrevPathname(pathname);
-      }, 300); // match this with CSS animation duration
-      
-      return () => clearTimeout(timer);
+      // Update content immediately but with transition effect
+      setCurrentChildren(children);
+      setPrevPathname(pathname);
     }
   }, [pathname, children, prevPathname]);
 
   return (
     <div 
       className={cn(
-        "transition-all duration-300 w-full", 
-        isTransitioning ? "opacity-0 transform translate-x-4" : "opacity-100 transform translate-x-0",
+        "transition-opacity duration-200 ease-in-out w-full", 
         className
       )}
+      key={pathname}
+      style={{
+        animation: 'fadeIn 0.2s ease-out'
+      }}
     >
       {currentChildren}
     </div>

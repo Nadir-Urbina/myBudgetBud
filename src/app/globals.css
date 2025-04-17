@@ -58,7 +58,7 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
 
     --card: 0 0% 100%;
@@ -67,24 +67,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
  
-    --primary: 222 80% 50%;
+    --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
  
     --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 25%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
  
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
  
-    --accent: 142 76% 45%;
-    --accent-foreground: 222 47% 20%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
  
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 80% 50%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
  
     --radius: 0.5rem;
  
@@ -103,30 +103,30 @@
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
  
-    --card: 240 10% 10%;
+    --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
  
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
  
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
  
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
  
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
  
-    --accent: 142 70% 45%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
  
-    --destructive: 0 62.8% 40.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
  
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217 91% 60%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
     --chart-1: 217 91% 60%;
     --chart-2: 142 70% 45%;
     --chart-3: 35 92% 65%;
@@ -140,7 +140,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
 }
 
@@ -221,3 +221,336 @@
 .nav-item:active {
   transform: scale(0.95);
 }
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-10px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+}
+
+/* Mobile menu styles */
+.mobile-menu {
+  animation: slideIn 300ms ease forwards;
+  will-change: transform, opacity;
+}
+
+.mobile-menu.hidden {
+  display: none;
+}
+
+/* Navigation item animations */
+.nav-item {
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: background-color, color, transform;
+  overflow: hidden;
+}
+
+.nav-item:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.nav-item:hover:after {
+  transform: scaleX(1);
+}
+
+/* Card animations */
+.card-animation {
+  animation: scaleIn 0.3s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+.card-animation:nth-child(1) { animation-delay: 0.1s; }
+.card-animation:nth-child(2) { animation-delay: 0.2s; }
+.card-animation:nth-child(3) { animation-delay: 0.3s; }
+
+/* Smooth page transitions for content */
+.content-wrapper {
+  min-height: calc(100vh - 4rem);
+  animation: fadeInUp 0.3s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* Remove default tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Shared navigation animation  */
+.shared-layout-container {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Prevent flickering during navigation */
+.page-container {
+  transition: opacity 0.25s ease-in-out;
+}
+
+.page-transitioning {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Improve mobile navigation experience */
+@media (max-width: 768px) {
+  .nav-item {
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+  }
+  
+  .mobile-menu-backdrop {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+/* Prevent flickering during transitions */
+.no-flicker {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* Smooth page transitions */
+#__next {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 100ms ease-out;
+}
+
+/* Prevent iOS tap highlight */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* PWA Install Banner */
+.install-banner {
+  animation: slideUp 0.5s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* Fix for blurry text during animations */
+* {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Define smooth animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Mobile menu styles */
+.mobile-menu-backdrop {
+  animation: fadeIn 200ms ease forwards;
+  backdrop-filter: blur(2px);
+}
+
+.nav-item {
+  animation: slideIn 200ms ease forwards;
+  will-change: transform, opacity;
+}
+
+/* No flicker class to prevent blinking during transitions */
+.no-flicker {
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+/* Apply no-flicker to all navigation and page transitions */
+#__next, main {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  perspective: 1000;
+  transform-style: preserve-3d;
+}
+
+/* Add smooth card animations */
+.card-animation {
+  animation: scaleIn 300ms ease forwards;
+  will-change: transform, opacity;
+}
+
+/* Fix for iOS tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Fix for blurry text during animations */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+

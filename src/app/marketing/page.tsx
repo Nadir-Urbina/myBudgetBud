@@ -14,6 +14,7 @@ import {
   Wallet,
   Moon,
   Sun,
+  Menu,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
@@ -22,6 +23,7 @@ import { useEffect, useState } from 'react';
 export default function LandingPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Prevent hydration errors by only rendering the page once mounted
   useEffect(() => {
@@ -35,39 +37,85 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       {/* Header */}
-      <header className="container mx-auto py-6 px-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Wallet className="h-8 w-8 text-primary" />
-          <span className="font-bold text-2xl">MyBudgetBud</span>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2 rounded-full bg-background/80 border border-border hover:bg-accent transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? (
-              <Sun size={18} className="text-yellow-400" />
-            ) : (
-              <Moon size={18} className="text-slate-700" />
-            )}
-          </button>
+      <header className="container mx-auto py-6 px-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <Wallet className="h-8 w-8 text-primary" />
+            <span className="font-bold text-2xl">MyBudgetBud</span>
+          </div>
           
-          <Link 
-            href="/signin" 
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Sign In
-          </Link>
-          <Link href="/signup">
-            <Button size="sm" variant="secondary">Get Started</Button>
-          </Link>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-full bg-background/80 border border-border hover:bg-accent transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun size={18} className="text-yellow-400" />
+              ) : (
+                <Moon size={18} className="text-slate-700" />
+              )}
+            </button>
+            
+            <Link 
+              href="/signin" 
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link href="/signup">
+              <Button size="sm" variant="secondary">Get Started</Button>
+            </Link>
+          </div>
+          
+          {/* Mobile Navigation */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-full bg-background/80 border border-border hover:bg-accent transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun size={16} className="text-yellow-400" />
+              ) : (
+                <Moon size={16} className="text-slate-700" />
+              )}
+            </button>
+            
+            <div className="relative">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-full bg-background/80 border border-border hover:bg-accent transition-colors"
+                aria-label="Menu"
+              >
+                <Menu size={16} />
+              </button>
+              
+              {mobileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 py-2 bg-background rounded-md shadow-lg border border-border z-50">
+                  <Link 
+                    href="/signin" 
+                    className="block px-4 py-2 text-sm hover:bg-accent transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    href="/signup" 
+                    className="block px-4 py-2 text-sm font-medium text-primary hover:bg-accent transition-colors"
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto pt-20 pb-32 px-4">
+      <section className="container mx-auto pt-16 md:pt-20 pb-24 md:pb-32 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-6">
             Your Personal Budget Companion
@@ -81,12 +129,12 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2 w-full sm:w-auto">
                 Start for Free <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/signin">
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 Learn More
               </Button>
             </Link>
@@ -95,10 +143,10 @@ export default function LandingPage() {
       </section>
 
       {/* App Screenshot */}
-      <section className="container mx-auto px-4 -mt-24 mb-24">
+      <section className="container mx-auto px-4 -mt-16 md:-mt-24 mb-16 md:mb-24">
         <div className="max-w-5xl mx-auto rounded-2xl bg-gradient-to-tr from-primary/5 via-primary/10 to-background border shadow-xl overflow-hidden">
           <div className="p-2">
-            <div className="w-full h-[500px] bg-card rounded-xl flex items-center justify-center">
+            <div className="w-full h-[300px] md:h-[500px] bg-card rounded-xl flex items-center justify-center">
               <div className="text-center">
                 <div className="inline-flex bg-primary/20 p-4 rounded-full mb-4">
                   <DollarSign className="h-10 w-10 text-primary" />

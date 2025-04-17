@@ -2,14 +2,16 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { MainNav } from '@/components/layout/MainNav';
+import { SidebarNav } from '@/components/layout/SidebarNav';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, Wallet, PieChart, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PageTransition } from '@/components/ui/page-transition';
-import { getAuth } from "firebase/auth";
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function DashboardLayoutClient({
   children,
@@ -21,22 +23,14 @@ export default function DashboardLayoutClient({
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [menuExiting, setMenuExiting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [redirected, setRedirected] = useState(false);
 
+  // Authentication check - only redirect once and only if needed
   useEffect(() => {
-    // Set loading to false when component mounts
-    setIsLoading(false);
-    
-    // Only check authentication and redirect if we haven't redirected already
-    // and we're not already on the signin page
-    if (!redirected && !loading && !user && !pathname.includes('/signin')) {
-      console.log('User not authenticated, redirecting to signin');
-      setRedirected(true);
-      router.push('/signin');
+    if (!loading && !user) {
+      router.replace('/signin');
     }
-  }, [user, loading, router, pathname, redirected]);
+  }, [user, loading, router]);
 
   useEffect(() => {
     // Close the mobile menu when the route changes
@@ -113,7 +107,7 @@ export default function DashboardLayoutClient({
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar - hidden on mobile, visible on medium screens and up */}
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 border-r bg-card">
-        <MainNav />
+        <SidebarNav />
       </aside>
 
       {/* Mobile menu */}
@@ -157,7 +151,65 @@ export default function DashboardLayoutClient({
                 : 'slideInFromLeft 0.3s ease-out forwards'
             }}
           >
-            <MainNav onNavItemClick={handleNavItemClick} />
+            <nav className="flex flex-col p-4 space-y-2">
+              {/* Use the same nav items as in SidebarNav but with mobile styling */}
+              <div className="flex flex-col space-y-1 pb-4">
+                <Link
+                  href="/dashboard"
+                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                    pathname === '/dashboard' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  <Menu className="h-4 w-4" />
+                  Dashboard
+                </Link>
+                <Link
+                  href="/budgets"
+                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                    pathname === '/budgets' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  <Wallet className="h-4 w-4" />
+                  Budgets
+                </Link>
+                <Link
+                  href="/analytics"
+                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                    pathname === '/analytics' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  <PieChart className="h-4 w-4" />
+                  Analytics
+                </Link>
+                <Link
+                  href="/settings"
+                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                    pathname === '/settings' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
+              </div>
+              <div className="border-t pt-4">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-sm font-medium text-muted-foreground"
+                  onClick={() => signOut(auth)}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
+            </nav>
           </div>
         )}
 
@@ -170,4 +222,4 @@ export default function DashboardLayoutClient({
       </div>
     </div>
   );
-} 
+}

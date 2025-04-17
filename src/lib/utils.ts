@@ -20,25 +20,70 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
-export function calculateDateRange(period: 'weekly' | 'bi-weekly' | 'monthly', startDate: Date): {
-  startDate: Date;
-  endDate: Date;
-} {
-  const endDate = new Date(startDate);
+export function calculateDateRange(
+  period: 'weekly' | 'biweekly' | 'monthly',
+  referenceDate: Date = new Date(),
+  periodDetail: string = '1'
+): { startDate: Date; endDate: Date } {
+  const now = new Date(referenceDate);
+  const periodNum = parseInt(periodDetail) || 1;
   
-  switch (period) {
-    case 'weekly':
-      endDate.setDate(startDate.getDate() + 6);
-      break;
-    case 'bi-weekly':
-      endDate.setDate(startDate.getDate() + 13);
-      break;
-    case 'monthly':
-      endDate.setMonth(startDate.getMonth() + 1);
-      endDate.setDate(startDate.getDate() - 1);
-      break;
+  // Reset time part of the date
+  now.setHours(0, 0, 0, 0);
+  
+  // Get the current year
+  const currentYear = now.getFullYear();
+  
+  if (period === 'weekly') {
+    // Calculate the first day of the year
+    const firstDayOfYear = new Date(currentYear, 0, 1);
+    
+    // Calculate days to add based on week number (each week is 7 days)
+    const daysToAdd = (periodNum - 1) * 7;
+    
+    // Set start date to the first day of the specified week
+    const startDate = new Date(firstDayOfYear);
+    startDate.setDate(firstDayOfYear.getDate() + daysToAdd);
+    
+    // Set end date to 6 days after start date (7-day period)
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    
+    return { startDate, endDate };
+  } else if (period === 'biweekly') {
+    // Calculate the first day of the year
+    const firstDayOfYear = new Date(currentYear, 0, 1);
+    
+    // Calculate days to add based on bi-week number (each bi-week is 14 days)
+    const daysToAdd = (periodNum - 1) * 14;
+    
+    // Set start date to the first day of the specified bi-week
+    const startDate = new Date(firstDayOfYear);
+    startDate.setDate(firstDayOfYear.getDate() + daysToAdd);
+    
+    // Set end date to 13 days after start date (14-day period)
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 13);
+    
+    return { startDate, endDate };
+  } else if (period === 'monthly') {
+    // Month is 0-indexed in JavaScript (0 = January, 11 = December)
+    const month = periodNum - 1;
+    
+    // Set start date to the first day of the specified month
+    const startDate = new Date(currentYear, month, 1);
+    
+    // Set end date to the last day of the specified month
+    const endDate = new Date(currentYear, month + 1, 0);
+    
+    return { startDate, endDate };
   }
-
+  
+  // Default fallback to weekly (should not reach here if valid period is provided)
+  const startDate = new Date(now);
+  const endDate = new Date(now);
+  endDate.setDate(now.getDate() + 6);
+  
   return { startDate, endDate };
 }
 

@@ -10,49 +10,74 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import type { Budget } from '@/types/budget';
 
-interface ExpenseFormProps {
+interface BudgetItemFormProps {
   open: boolean;
   onClose: () => void;
   budgetId?: string;
+  editItem?: {
+    id: string;
+    categoryId: string;
+    amount: number;
+    notes?: string;
+    date: Date;
+    completed?: boolean;
+    type: 'budget' | 'actual';
+  } | null;
 }
 
-export function ExpenseForm({ open, onClose, budgetId }: ExpenseFormProps) {
+export function BudgetItemForm({ open, onClose, budgetId, editItem }: BudgetItemFormProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState<Date>(new Date());
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
   
-  const { data: budgets = [] } = useCollection<Budget>('budgets', user?.uid || '');
+  const { data: budgets = [], refresh: refreshBudgets } = useCollection<Budget>('budgets', user?.uid || '');
+  const { update: updateExpense, add: addExpense, refresh: refreshExpenses } = useCollection<any>('expenses', user?.uid || '');
   const [selectedBudget, setSelectedBudget] = useState<string>(budgetId || '');
   
-  // Reset form on open/close
+  // Refresh all data function
+  const refreshAllData = () => {
+    refreshBudgets();
+    refreshExpenses();
+  };
+  
+  // Reset form on open/close and populate with editItem if provided
   useEffect(() => {
     if (open) {
-      setDate(new Date());
-      setCategory('');
-      setAmount('');
-      setNotes('');
-      setSelectedBudget(budgetId || '');
+      if (editItem) {
+        // Populate form with item being edited
+        setCategory(editItem.categoryId || '');
+        setAmount(editItem.amount.toString() || '');
+        setNotes(editItem.notes || '');
+        setSelectedBudget(budgetId || '');
+      } else {
+        // Reset form for new item
+        setCategory('');
+        setAmount('');
+        setNotes('');
+        setSelectedBudget(budgetId || '');
+      }
     }
-  }, [open, budgetId]);
+  }, [open, budgetId, editItem]);
+  
+  // Update selected budget when budgetId changes
+  useEffect(() => {
+    if (budgetId) {
+      setSelectedBudget(budgetId);
+    }
+  }, [budgetId]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user) {
-      toast.error('You must be logged in to register expenses');
+      toast.error('You must be logged in to manage budget items');
       return;
     }
     
@@ -70,24 +95,60 @@ export function ExpenseForm({ open, onClose, budgetId }: ExpenseFormProps) {
     try {
       setLoading(true);
       
-      // Create the expense document
-      const expenseData = {
-        userId: user.uid,
-        budgetId: selectedBudget,
-        categoryId: category,
-        amount: numAmount,
-        date,
-        notes,
-        type: 'actual', // This identifies it as an actual expense, not a budget item
-        createdAt: serverTimestamp(),
-      };
+      if (editItem) {
+        // Update existing item using the useCollection hook's update method
+        await updateExpense(editItem.id, {
+          categoryId: category,
+          amount: numAmount,
+          notes,
+          updatedAt: serverTimestamp(),
+        });
+        
+        toast.success('Budget item updated successfully');
+      } else {
+        // Create new budget item document using the useCollection hook's add method
+        const itemData = {
+          userId: user.uid,
+          budgetId: selectedBudget,
+          categoryId: category,
+          amount: numAmount,
+          notes,
+          type: 'budget', // This identifies it as a planned budget item, not an actual expense
+          date: new Date(), // Use current date as reference
+          completed: false, // Default to not completed
+          completedAt: null, // Will be set when marked as completed
+          createdAt: serverTimestamp(),
+        };
+        
+        await addExpense(itemData);
+        
+        // Update the budget's total expenses and savings
+        const budget = budgets.find(b => b.id === selectedBudget);
+        if (budget) {
+          const budgetRef = doc(db, 'budgets', selectedBudget);
+          
+          // Update the budget's planned totals
+          const newTotalExpenses = (budget.totalExpenses || 0) + numAmount;
+          const newSavings = (budget.totalIncome || 0) - newTotalExpenses;
+          
+          await updateDoc(budgetRef, {
+            totalExpenses: newTotalExpenses,
+            savings: newSavings,
+            updatedAt: serverTimestamp(),
+          });
+        }
+        
+        toast.success('Budget item added successfully');
+      }
       
-      await addDoc(collection(db, 'expenses'), expenseData);
-      toast.success('Expense registered successfully');
+      // Explicitly refresh the data
+      refreshAllData();
+      
+      // Close the form
       onClose();
     } catch (error) {
-      console.error('Error registering expense:', error);
-      toast.error('Failed to register expense');
+      console.error(`Error ${editItem ? 'updating' : 'adding'} budget item:`, error);
+      toast.error(`Failed to ${editItem ? 'update' : 'add'} budget item`);
     } finally {
       setLoading(false);
     }
@@ -100,9 +161,11 @@ export function ExpenseForm({ open, onClose, budgetId }: ExpenseFormProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Register New Expense</DialogTitle>
+          <DialogTitle>{editItem ? 'Edit Budget Item' : 'Add Budget Item'}</DialogTitle>
           <DialogDescription>
-            Record an actual expense against your budget.
+            {editItem ? 
+              'Edit the details of your budget item.' : 
+              'Add a forecasted expense to your budget.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -151,7 +214,7 @@ export function ExpenseForm({ open, onClose, budgetId }: ExpenseFormProps) {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="amount">Actual Amount Spent</Label>
+              <Label htmlFor="amount">Planned Amount</Label>
               <Input
                 id="amount"
                 type="number"
@@ -164,36 +227,10 @@ export function ExpenseForm({ open, onClose, budgetId }: ExpenseFormProps) {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="date">Date of Expense</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={(newDate) => setDate(newDate || new Date())}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            
-            <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
               <Textarea
                 id="notes"
-                placeholder="Add any details about this expense..."
+                placeholder="Add any additional details about this budget item..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
@@ -203,7 +240,7 @@ export function ExpenseForm({ open, onClose, budgetId }: ExpenseFormProps) {
           <DialogFooter>
             <Button variant="outline" type="button" onClick={onClose}>Cancel</Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Registering...' : 'Register Expense'}
+              {loading ? (editItem ? 'Updating...' : 'Adding...') : (editItem ? 'Update Item' : 'Add Item')}
             </Button>
           </DialogFooter>
         </form>
