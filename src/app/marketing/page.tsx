@@ -92,7 +92,7 @@ export default function LandingPage() {
 
   // Handle clicks outside the mobile menu
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (isTogglingRef.current || !mobileMenuOpen) return;
       
       const targetElement = event.target as Node;
@@ -110,13 +110,13 @@ export default function LandingPage() {
     }
 
     if (mobileMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside, true);
-      document.addEventListener('touchstart', handleClickOutside, true);
+      document.addEventListener('mousedown', handleClickOutside as EventListener, true);
+      document.addEventListener('touchstart', handleClickOutside as EventListener, true);
     }
     
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside, true);
-      document.removeEventListener('touchstart', handleClickOutside, true);
+      document.removeEventListener('mousedown', handleClickOutside as EventListener, true);
+      document.removeEventListener('touchstart', handleClickOutside as EventListener, true);
     };
   }, [mobileMenuOpen]);
 
