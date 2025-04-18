@@ -71,7 +71,7 @@ function InstallBanner() {
           <Download size={24} className="text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold text-sm">Install MyBudgetBud</h3>
+          <h3 className="font-semibold text-sm">Install MyBudgetPal</h3>
           <p className="text-xs text-muted-foreground mt-1 mb-3">
             {isIOS 
               ? "Add to your home screen for offline access" 

@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sign Up - MyBudgetBud',
-  description: 'Create a new MyBudgetBud account',
+  title: 'Sign Up - MyBudgetPal',
+  description: 'Create a new MyBudgetPal account',
 };
 
 export default function SignUpLayout({

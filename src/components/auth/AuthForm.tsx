@@ -142,6 +142,17 @@ export function AuthForm({ mode }: AuthFormProps) {
                   required
                   className="w-full pr-10"
                 />
+                <button 
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-5 w-5" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" />
+                  )}
+                </button>
               </div>
             </div>
           )}

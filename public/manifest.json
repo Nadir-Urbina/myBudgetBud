@@ -1,6 +1,6 @@
 {
-  "name": "MyBudgetBud",
-  "short_name": "BudgetBud",
+  "name": "MyBudgetPal",
+  "short_name": "BudgetPal",
   "description": "Your personal budget tracking application",
   "start_url": "/",
   "display": "standalone",

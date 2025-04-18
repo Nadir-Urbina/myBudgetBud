@@ -7,10 +7,12 @@ import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { signIn } = useAuth();
 
@@ -25,6 +27,10 @@ export default function SignInPage() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md space-y-8">
@@ -33,13 +39,13 @@ export default function SignInPage() {
             <div className="relative w-16 h-16">
               <Image 
                 src="/icons/mainLogo.png" 
-                alt="MyBudgetBud Logo" 
+                alt="MyBudgetPal Logo" 
                 fill
                 className="object-contain" 
               />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900">MyBudgetBud</h1>
+          <h1 className="text-4xl font-bold text-gray-900">MyBudgetPal</h1>
           <p className="mt-2 text-gray-600">Your personal budget tracking application</p>
         </div>
         
@@ -62,15 +68,28 @@ export default function SignInPage() {
             
             <div className="space-y-2">
               <Label htmlFor="password" className="text-gray-700">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full rounded-md border border-gray-300 px-3 py-2"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10"
+                />
+                <button 
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-5 w-5" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
             
             {error && (

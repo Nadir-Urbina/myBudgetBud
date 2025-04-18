@@ -58,7 +58,7 @@ export function MainNav() {
         <div className="container flex h-14 items-center">
           <div className="mr-4 flex">
             <Link href="/" className="flex items-center justify-center">
-              <span className="font-bold text-xl">BudgetBud</span>
+              <span className="font-bold text-xl">BudgetPal</span>
             </Link>
           </div>
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">

@@ -10,13 +10,13 @@ export default function SignUpPage() {
             <div className="relative w-16 h-16">
               <Image 
                 src="/icons/mainLogo.png" 
-                alt="MyBudgetBud Logo" 
+                alt="MyBudgetPal Logo" 
                 fill
                 className="object-contain" 
               />
             </div>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-primary">MyBudgetBud</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-primary">MyBudgetPal</h1>
           <p className="text-sm text-muted-foreground">Create your account to get started</p>
         </div>
         <AuthForm mode="signup" />

@@ -106,8 +106,8 @@ export function InstallPrompt() {
         <div className="flex-shrink-0 bg-primary/10 p-2 rounded-full">
           <Download className="h-6 w-6 text-primary" />
         </div>
-        <div className="flex-1">
-          <h3 className="font-medium mb-1">Install BudgetBud</h3>
+        <div className="flex-1 px-4 md:px-6 py-3">
+          <h3 className="font-medium mb-1">Install BudgetPal</h3>
           <p className="text-sm text-muted-foreground mb-3">
             {isIOS 
               ? "Add this app to your home screen for a better experience."

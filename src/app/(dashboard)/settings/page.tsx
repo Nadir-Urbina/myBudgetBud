@@ -9,15 +9,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { UserPreferences } from '@/types/budget';
+import { useTheme } from '@/providers/theme-provider';
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
+  const { theme: currentTheme, setTheme } = useTheme();
   const { data: preferences, loading, update, add } = 
     useCollection<UserPreferences>('preferences', user?.uid || '');
   
   const [currency, setCurrency] = useState<string>('USD');
   const [defaultPeriod, setDefaultPeriod] = useState<string>('weekly');
-  const [theme, setTheme] = useState<string>('light');
+  const [theme, setThemeState] = useState<string>('light');
   const [isSaving, setIsSaving] = useState(false);
 
   // Load preferences when data is available
@@ -25,9 +27,12 @@ export default function SettingsPage() {
     if (preferences && preferences.length > 0) {
       setCurrency(preferences[0].currency || 'USD');
       setDefaultPeriod(preferences[0].defaultBudgetPeriod || 'weekly');
-      setTheme(preferences[0].theme || 'light');
+      setThemeState(preferences[0].theme || currentTheme);
+    } else {
+      // Use current theme as default if no preferences are found
+      setThemeState(currentTheme);
     }
-  }, [preferences]);
+  }, [preferences, currentTheme]);
 
   const handleSavePreferences = async () => {
     if (!user) return;
@@ -61,6 +66,13 @@ export default function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Handle theme changes
+  const handleThemeChange = (value: string) => {
+    setThemeState(value);
+    // Immediately apply the theme
+    setTheme(value as 'light' | 'dark' | 'system');
   };
 
   if (loading) {
@@ -123,7 +135,7 @@ export default function SettingsPage() {
               <Label htmlFor="theme">Theme</Label>
               <Select
                 value={theme}
-                onValueChange={setTheme}
+                onValueChange={handleThemeChange}
               >
                 <SelectTrigger id="theme">
                   <SelectValue placeholder="Select theme" />

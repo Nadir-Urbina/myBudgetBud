@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sign In - MyBudgetBud',
-  description: 'Sign in to your MyBudgetBud account',
+  title: 'Sign In - MyBudgetPal',
+  description: 'Sign in to your MyBudgetPal account',
 };
 
 export default function SignInLayout({

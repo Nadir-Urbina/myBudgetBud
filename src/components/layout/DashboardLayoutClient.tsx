@@ -5,13 +5,14 @@ import { MainNav } from '@/components/layout/MainNav';
 import { SidebarNav } from '@/components/layout/SidebarNav';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, LogOut, Wallet, PieChart, Settings } from 'lucide-react';
+import { Menu, X, LogOut, Wallet, PieChart, Settings, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PageTransition } from '@/components/ui/page-transition';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { useTheme } from '@/providers/theme-provider';
 
 export default function DashboardLayoutClient({
   children,
@@ -19,11 +20,13 @@ export default function DashboardLayoutClient({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [menuExiting, setMenuExiting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   // Authentication check - only redirect once and only if needed
   useEffect(() => {
@@ -34,14 +37,16 @@ export default function DashboardLayoutClient({
 
   useEffect(() => {
     // Close the mobile menu when the route changes
-    setMenuExiting(true);
-    const timer = setTimeout(() => {
-      setMobileMenuOpen(false);
-      setMenuExiting(false);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [pathname]);
+    if (mobileMenuOpen) {
+      setMenuExiting(true);
+      const timer = setTimeout(() => {
+        setMobileMenuOpen(false);
+        setMenuExiting(false);
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, mobileMenuOpen]);
 
   const handleMenuToggle = () => {
     if (mobileMenuOpen) {
@@ -52,9 +57,22 @@ export default function DashboardLayoutClient({
       setTimeout(() => {
         setMobileMenuOpen(false);
         setMenuExiting(false);
+        // Enable scrolling on the main content
+        if (mainContentRef.current) {
+          mainContentRef.current.style.overflow = 'auto';
+        }
+        document.body.style.overflow = '';
       }, 300); // Match to your animation duration
     } else {
       setMobileMenuOpen(true);
+      // Disable scrolling on the main content
+      if (mainContentRef.current) {
+        mainContentRef.current.style.overflow = 'hidden';
+      }
+      // Only disable body scroll on mobile
+      if (window.innerWidth < 768) {
+        document.body.style.overflow = 'hidden';
+      }
     }
   };
   
@@ -66,6 +84,11 @@ export default function DashboardLayoutClient({
     setTimeout(() => {
       setMobileMenuOpen(false);
       setMenuExiting(false);
+      // Re-enable scrolling
+      if (mainContentRef.current) {
+        mainContentRef.current.style.overflow = 'auto';
+      }
+      document.body.style.overflow = '';
     }, 300); // Match to your animation duration
   };
 
@@ -81,17 +104,20 @@ export default function DashboardLayoutClient({
     return () => window.removeEventListener('keydown', handleEscape);
   }, [mobileMenuOpen]);
 
-  // Prevent scrolling when mobile menu is open
+  // Ensure overflow is properly reset on component unmount
   useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
     return () => {
       document.body.style.overflow = '';
     };
-  }, [mobileMenuOpen]);
+  }, []);
+
+  // Reset scrolling when route changes
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+    document.body.style.overflow = '';
+  }, [pathname]);
 
   // Show loading indicator while checking authentication
   if (loading) {
@@ -118,26 +144,39 @@ export default function DashboardLayoutClient({
             <div className="w-8 h-8 relative flex-shrink-0">
               <Image 
                 src="/icons/mainLogo.png" 
-                alt="MyBudgetBud Logo" 
+                alt="MyBudgetPal Logo" 
                 width={32} 
                 height={32} 
                 className="object-contain"
               />
             </div>
-            <h1 className="text-lg font-semibold">MyBudgetBud</h1>
+            <h1 className="text-lg font-semibold">MyBudgetPal</h1>
           </div>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleMenuToggle}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-full bg-background/80 border border-border hover:bg-accent transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun size={16} className="text-yellow-400" />
+              ) : (
+                <Moon size={16} className="text-slate-700" />
+              )}
+            </button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleMenuToggle}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
         </header>
 
         {/* Mobile menu overlay */}
@@ -161,6 +200,7 @@ export default function DashboardLayoutClient({
                       ? 'bg-primary text-primary-foreground' 
                       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
+                  onClick={handleNavItemClick}
                 >
                   <Menu className="h-4 w-4" />
                   Dashboard
@@ -172,6 +212,7 @@ export default function DashboardLayoutClient({
                       ? 'bg-primary text-primary-foreground' 
                       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
+                  onClick={handleNavItemClick}
                 >
                   <Wallet className="h-4 w-4" />
                   Budgets
@@ -183,6 +224,7 @@ export default function DashboardLayoutClient({
                       ? 'bg-primary text-primary-foreground' 
                       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
+                  onClick={handleNavItemClick}
                 >
                   <PieChart className="h-4 w-4" />
                   Analytics
@@ -194,6 +236,7 @@ export default function DashboardLayoutClient({
                       ? 'bg-primary text-primary-foreground' 
                       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
+                  onClick={handleNavItemClick}
                 >
                   <Settings className="h-4 w-4" />
                   Settings
@@ -214,7 +257,7 @@ export default function DashboardLayoutClient({
         )}
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6" ref={mainContentRef}>
           <PageTransition>
             {children}
           </PageTransition>
