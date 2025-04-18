@@ -2,10 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Simplified animation keyframes - keep only essential ones */
+/* Animation keyframes for transitions */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Reset problematic body styles */
+body {
+  @apply bg-background text-foreground;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
 }
 
 @layer base {
@@ -41,13 +49,9 @@
     --radius: 0.5rem;
  
     --chart-1: 222 80% 50%;
- 
     --chart-2: 142 76% 45%;
- 
     --chart-3: 35 92% 65%;
- 
     --chart-4: 326 80% 60%;
- 
     --chart-5: 270 75% 60%;
   }
  
@@ -86,15 +90,10 @@
     --chart-5: 270 75% 60%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    overflow-x: hidden;
-    touch-action: manipulation; /* Improves touch experience */
   }
 }
 
@@ -116,16 +115,7 @@
   @apply bg-background rounded-md p-4;
 }
 
-/* Basic static styles for mobile menu instead of transitions */
-.mobile-menu {
-  /* Simpler styling that doesn't force fixed positioning or overflow changes */
-  touch-action: manipulation;
-  -webkit-overflow-scrolling: touch;
-  max-height: 85vh; /* Prevent menu from being too tall */
-  overflow-y: auto; /* Allow scrolling within menu if needed */
-}
-
-/* Simple page transitions with no transform */
+/* Simple page transitions */
 .page-transition {
   animation: fadeIn 0.3s ease-out;
 }
@@ -133,7 +123,7 @@
 /* Fix for iOS tap delay */
 a, button {
   touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent; /* Prevent iOS tap highlight */
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Install banner styles */
@@ -153,34 +143,4 @@ a, button {
 #__next, main {
   @apply min-h-screen flex flex-col;
 }
-
-/* Ensure touch events work as expected */
-@media (hover: none) {
-  a:active, button:active {
-    @apply opacity-70;
-  }
-  
-  /* Add specific mobile fixes */
-  body {
-    overscroll-behavior-y: none; /* Prevent pull-to-refresh in some browsers */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  }
-  
-  /* Make sure mobile menu doesn't cause scrolling issues */
-  .mobile-nav, .mobile-menu {
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-  }
-}
-
-/* Remove problematic body classes */
-body {
-  overscroll-behavior-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Not using this anymore */
-/* body.menu-open {
-  overflow: hidden;
-} */
 

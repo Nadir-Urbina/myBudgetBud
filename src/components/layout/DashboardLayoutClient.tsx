@@ -24,8 +24,6 @@ export default function DashboardLayoutClient({
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [menuExiting, setMenuExiting] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
 
   // Authentication check - only redirect once and only if needed
@@ -35,89 +33,52 @@ export default function DashboardLayoutClient({
     }
   }, [user, loading, router]);
 
+  // Single useEffect to handle all mobile menu related side effects
   useEffect(() => {
-    // Close the mobile menu when the route changes
+    // Handle body overflow
     if (mobileMenuOpen) {
-      setMenuExiting(true);
-      const timer = setTimeout(() => {
-        setMobileMenuOpen(false);
-        setMenuExiting(false);
-      }, 300);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [pathname, mobileMenuOpen]);
-
-  const handleMenuToggle = () => {
-    if (mobileMenuOpen) {
-      // Start the exit animation
-      setMenuExiting(true);
-      
-      // Actually close the menu after animation completes
-      setTimeout(() => {
-        setMobileMenuOpen(false);
-        setMenuExiting(false);
-        // Enable scrolling on the main content
-        if (mainContentRef.current) {
-          mainContentRef.current.style.overflow = 'auto';
-        }
-        document.body.style.overflow = '';
-      }, 300); // Match to your animation duration
+      document.body.style.overflow = 'hidden';
     } else {
-      setMobileMenuOpen(true);
-      // Disable scrolling on the main content
-      if (mainContentRef.current) {
-        mainContentRef.current.style.overflow = 'hidden';
-      }
-      // Only disable body scroll on mobile
-      if (window.innerWidth < 768) {
-        document.body.style.overflow = 'hidden';
-      }
-    }
-  };
-  
-  const handleNavItemClick = () => {
-    // Start the exit animation
-    setMenuExiting(true);
-    
-    // Actually close the menu after animation completes
-    setTimeout(() => {
-      setMobileMenuOpen(false);
-      setMenuExiting(false);
-      // Re-enable scrolling
-      if (mainContentRef.current) {
-        mainContentRef.current.style.overflow = 'auto';
-      }
       document.body.style.overflow = '';
-    }, 300); // Match to your animation duration
-  };
+    }
 
-  // Close menu when escape key is pressed
-  useEffect(() => {
+    // Handle escape key press
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && mobileMenuOpen) {
-        handleMenuToggle();
+        setMobileMenuOpen(false);
       }
     };
 
     window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [mobileMenuOpen]);
-
-  // Ensure overflow is properly reset on component unmount
-  useEffect(() => {
+    
+    // Reset menu when route changes
+    const handleRouteChange = () => {
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
+    window.addEventListener('popstate', handleRouteChange);
+    
+    // Cleanup function
     return () => {
       document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleEscape);
+      window.removeEventListener('popstate', handleRouteChange);
     };
-  }, []);
+  }, [mobileMenuOpen]);
 
   // Reset scrolling when route changes
   useEffect(() => {
+    setMobileMenuOpen(false);
     if (mainContentRef.current) {
       mainContentRef.current.scrollTop = 0;
     }
-    document.body.style.overflow = '';
   }, [pathname]);
+
+  const toggleMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   // Show loading indicator while checking authentication
   if (loading) {
@@ -167,7 +128,7 @@ export default function DashboardLayoutClient({
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={handleMenuToggle}
+              onClick={toggleMenu}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? (
@@ -179,82 +140,88 @@ export default function DashboardLayoutClient({
           </div>
         </header>
 
-        {/* Mobile menu overlay */}
-        {(mobileMenuOpen || menuExiting) && (
+        {/* Mobile menu */}
+        <div 
+          className={`fixed inset-0 bg-black/50 z-40 transition-all duration-300 ${
+            mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
+          onClick={toggleMenu}
+        >
           <div 
-            ref={menuRef}
-            className="absolute inset-x-0 top-14 bottom-0 z-40 bg-background overflow-y-auto"
-            style={{ 
-              animation: menuExiting 
-                ? 'slideOutLeft 0.3s ease-out forwards' 
-                : 'slideInFromLeft 0.3s ease-out forwards'
-            }}
+            className={`fixed inset-y-0 left-0 w-64 bg-background shadow-xl z-50 transition-transform duration-300 ease-in-out ${
+              mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+            onClick={(e) => e.stopPropagation()}
           >
-            <nav className="flex flex-col p-4 space-y-2">
-              {/* Use the same nav items as in SidebarNav but with mobile styling */}
-              <div className="flex flex-col space-y-1 pb-4">
-                <Link
-                  href="/dashboard"
-                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                    pathname === '/dashboard' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                  onClick={handleNavItemClick}
-                >
-                  <Menu className="h-4 w-4" />
-                  Dashboard
-                </Link>
-                <Link
-                  href="/budgets"
-                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                    pathname === '/budgets' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                  onClick={handleNavItemClick}
-                >
-                  <Wallet className="h-4 w-4" />
-                  Budgets
-                </Link>
-                <Link
-                  href="/analytics"
-                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                    pathname === '/analytics' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                  onClick={handleNavItemClick}
-                >
-                  <PieChart className="h-4 w-4" />
-                  Analytics
-                </Link>
-                <Link
-                  href="/settings"
-                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                    pathname === '/settings' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                  onClick={handleNavItemClick}
-                >
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </Link>
-              </div>
-              <div className="border-t pt-4">
+            <div className="flex flex-col h-full pt-16">
+              <nav className="flex-1 px-4 py-4 overflow-y-auto">
+                <div className="flex flex-col space-y-2">
+                  <Link
+                    href="/dashboard"
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === '/dashboard' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Menu className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/budgets"
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === '/budgets' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Wallet className="h-4 w-4" />
+                    Budgets
+                  </Link>
+                  <Link
+                    href="/analytics"
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === '/analytics' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <PieChart className="h-4 w-4" />
+                    Analytics
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === '/settings' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+                </div>
+              </nav>
+              <div className="p-4 border-t">
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-sm font-medium text-muted-foreground"
-                  onClick={() => signOut(auth)}
+                  onClick={() => {
+                    signOut(auth);
+                    setMobileMenuOpen(false);
+                  }}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
               </div>
-            </nav>
+            </div>
           </div>
-        )}
+        </div>
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6" ref={mainContentRef}>
