@@ -91,14 +91,14 @@ export default function DashboardLayoutClient({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen h-[100dvh] overflow-hidden bg-background">
       {/* Sidebar - hidden on mobile, visible on medium screens and up */}
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-30 border-r bg-card">
         <SidebarNav />
       </aside>
 
       {/* Mobile menu */}
-      <div className="flex flex-col flex-1 md:pl-64">
+      <div className="flex flex-col flex-1 md:pl-64 h-full">
         {/* Mobile header */}
         <header className="sticky top-0 z-20 flex items-center justify-between px-4 py-2 border-b bg-card/80 backdrop-blur md:hidden">
           <div className="flex items-center space-x-2">
@@ -224,7 +224,7 @@ export default function DashboardLayoutClient({
         </div>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6" ref={mainContentRef}>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-16" ref={mainContentRef}>
           <PageTransition>
             {children}
           </PageTransition>
