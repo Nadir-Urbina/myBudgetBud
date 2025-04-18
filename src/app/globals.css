@@ -2,58 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Add page transition animations */
+/* Simplified animation keyframes - keep only essential ones */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slideInFromRight {
-  from { transform: translateX(30px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideInFromLeft {
-  from { transform: translateX(-30px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideOutLeft {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(-30px); opacity: 0; }
-}
-
-/* Additional navigation transition classes */
-.page-enter {
-  opacity: 0;
-  transform: translateX(20px);
-}
-
-.page-enter-active {
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.page-exit {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.page-exit-active {
-  opacity: 0;
-  transform: translateX(-20px);
-  transition: opacity 300ms, transform 300ms;
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @layer base {
@@ -140,7 +92,9 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground overflow-x-hidden;
+    @apply bg-background text-foreground;
+    overflow-x: hidden;
+    touch-action: manipulation; /* Improves touch experience */
   }
 }
 
@@ -150,7 +104,7 @@
 }
 
 .card-hover {
-  @apply transition-all hover:shadow-md;
+  @apply hover:shadow-md;
 }
 
 /* Card with gradient border */
@@ -162,395 +116,71 @@
   @apply bg-background rounded-md p-4;
 }
 
-/* Mobile menu styles */
+/* Basic static styles for mobile menu instead of transitions */
 .mobile-menu {
-  @apply fixed inset-0 z-50 flex flex-col p-6 bg-background/95 backdrop-blur-sm md:hidden;
+  /* Simpler styling that doesn't force fixed positioning or overflow changes */
+  touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
+  max-height: 85vh; /* Prevent menu from being too tall */
+  overflow-y: auto; /* Allow scrolling within menu if needed */
 }
 
-/* Page transitions */
+/* Simple page transitions with no transform */
 .page-transition {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Custom route change transitions */
-.route-change-animation {
-  @apply transition-all duration-300 ease-in-out;
+/* Fix for iOS tap delay */
+a, button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent; /* Prevent iOS tap highlight */
 }
 
-.slide-in-right {
-  animation: slideInFromRight 0.3s forwards;
+/* Install banner styles */
+.install-banner {
+  @apply fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-40;
 }
 
-.slide-in-left {
-  animation: slideInFromLeft 0.3s forwards;
-}
-
-/* Mobile menu transitions */
-.mobile-menu-enter {
-  opacity: 0;
-  transform: translateX(-100%);
-}
-
-.mobile-menu-enter-active {
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.mobile-menu-exit {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.mobile-menu-exit-active {
-  opacity: 0;
-  transform: translateX(-100%);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* Card animations */
-.card-animate {
-  animation: slideUp 0.4s ease-out;
-}
-
-/* Mobile navigation item animations */
-.nav-item {
-  transition: all 0.2s ease;
-}
-
-.nav-item:active {
-  transform: scale(0.95);
-}
-
-/* Animation Keyframes */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from { transform: translateX(-10px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(8px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    transform: scale(0.98);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Page transitions */
-.page-transition-enter {
-  opacity: 0;
-  transform: scale(0.98);
-}
-
-.page-transition-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
-}
-
-.page-transition-exit {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-  transform: scale(0.98);
-  transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
-}
-
-/* Mobile menu styles */
-.mobile-menu {
-  animation: slideIn 300ms ease forwards;
-  will-change: transform, opacity;
-}
-
-.mobile-menu.hidden {
-  display: none;
-}
-
-/* Navigation item animations */
-.nav-item {
-  position: relative;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: background-color, color, transform;
-  overflow: hidden;
-}
-
-.nav-item:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: currentColor;
-  transform: scaleX(0);
-  transition: transform 0.2s ease;
-}
-
-.nav-item:hover:after {
-  transform: scaleX(1);
-}
-
-/* Card animations */
-.card-animation {
-  animation: scaleIn 0.3s ease-out forwards;
-  will-change: transform, opacity;
-}
-
-.card-animation:nth-child(1) { animation-delay: 0.1s; }
-.card-animation:nth-child(2) { animation-delay: 0.2s; }
-.card-animation:nth-child(3) { animation-delay: 0.3s; }
-
-/* Smooth page transitions for content */
-.content-wrapper {
-  min-height: calc(100vh - 4rem);
-  animation: fadeInUp 0.3s ease-out forwards;
-  will-change: transform, opacity;
-}
-
-/* Remove default tap highlight on mobile */
-* {
+/* Important performance fix for mobile */
+.no-flicker {
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-/* Shared navigation animation  */
-.shared-layout-container {
-  position: relative;
-  min-height: 100vh;
-  overflow-x: hidden;
-  width: 100%;
+/* Ensure proper layout for core containers */
+#__next, main {
+  @apply min-h-screen flex flex-col;
 }
 
-/* Prevent flickering during navigation */
-.page-container {
-  transition: opacity 0.25s ease-in-out;
-}
-
-.page-transitioning {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* Improve mobile navigation experience */
-@media (max-width: 768px) {
-  .nav-item {
-    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+/* Ensure touch events work as expected */
+@media (hover: none) {
+  a:active, button:active {
+    @apply opacity-70;
   }
   
-  .mobile-menu-backdrop {
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }
-}
-
-/* Prevent flickering during transitions */
-.no-flicker {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-  will-change: transform;
-}
-
-/* Smooth page transitions */
-#__next {
-  transition: opacity 0.2s ease-in-out;
-}
-
-.fade-enter {
-  opacity: 0;
-}
-
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 200ms ease-in;
-}
-
-.fade-exit {
-  opacity: 1;
-}
-
-.fade-exit-active {
-  opacity: 0;
-  transition: opacity 100ms ease-out;
-}
-
-/* Prevent iOS tap highlight */
-a, button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* PWA Install Banner */
-.install-banner {
-  animation: slideUp 0.5s ease-out forwards;
-  will-change: transform, opacity;
-}
-
-/* Fix for blurry text during animations */
-* {
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Define smooth animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Page transitions */
-.page-transition-enter {
-  opacity: 0;
-  transform: scale(0.98);
-}
-
-.page-transition-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.page-transition-exit {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-  transform: scale(0.98);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* Mobile menu styles */
-.mobile-menu-backdrop {
-  animation: fadeIn 200ms ease forwards;
-  backdrop-filter: blur(2px);
-}
-
-.nav-item {
-  animation: slideIn 200ms ease forwards;
-  will-change: transform, opacity;
-}
-
-/* No flicker class to prevent blinking during transitions */
-.no-flicker {
-  -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  will-change: transform, opacity;
-}
-
-/* Apply no-flicker to all navigation and page transitions */
-#__next, main {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  will-change: transform, opacity;
-  perspective: 1000;
-  transform-style: preserve-3d;
-}
-
-/* Add smooth card animations */
-.card-animation {
-  animation: scaleIn 300ms ease forwards;
-  will-change: transform, opacity;
-}
-
-/* Fix for iOS tap highlight */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Fix for blurry text during animations */
-body {
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
+  /* Add specific mobile fixes */
   body {
-    @apply bg-background text-foreground;
+    overscroll-behavior-y: none; /* Prevent pull-to-refresh in some browsers */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  /* Make sure mobile menu doesn't cause scrolling issues */
+  .mobile-nav, .mobile-menu {
+    overscroll-behavior: contain;
+    touch-action: pan-y;
   }
 }
+
+/* Remove problematic body classes */
+body {
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Not using this anymore */
+/* body.menu-open {
+  overflow: hidden;
+} */
 

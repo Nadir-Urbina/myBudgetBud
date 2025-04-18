@@ -28,32 +28,67 @@ export function ThemeProvider({
   storageKey = "theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [theme, setTheme] = useState<Theme>(
+    () => (typeof localStorage !== "undefined" && localStorage.getItem(storageKey) as Theme) || defaultTheme
+  );
+  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  // Update theme immediately when it changes
+  const applyTheme = (newTheme: Theme) => {
     const root = window.document.documentElement;
+    
+    // Remove existing theme classes
     root.classList.remove("light", "dark");
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
+    // Apply appropriate theme class
+    if (newTheme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
 
       root.classList.add(systemTheme);
-      return;
+    } else {
+      root.classList.add(newTheme);
     }
+    
+    // Store theme in localStorage
+    localStorage.setItem(storageKey, newTheme);
+  };
 
-    root.classList.add(theme);
-  }, [theme]);
+  // Initialize theme and handle system theme change
+  useEffect(() => {
+    setMounted(true);
+    
+    // Apply initial theme
+    applyTheme(theme);
+    
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleSystemThemeChange = () => {
+      if (theme === "system") {
+        applyTheme("system");
+      }
+    };
+    
+    mediaQuery.addEventListener("change", handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
+  }, [theme, storageKey]);
+
+  // Update theme when changed through context
+  const setThemeWithUpdate = (newTheme: Theme) => {
+    setTheme(newTheme);
+    applyTheme(newTheme);
+  };
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
+    setTheme: setThemeWithUpdate,
   };
+
+  // Prevent flash of unstyled content
+  if (!mounted) {
+    return <>{children}</>;
+  }
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>

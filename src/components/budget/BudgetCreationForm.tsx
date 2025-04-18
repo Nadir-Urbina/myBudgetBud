@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { calculateDateRange } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -209,6 +209,9 @@ export function BudgetCreationForm({ open, onClose, onSuccess }: BudgetCreationF
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Create New Budget</DialogTitle>
+            <DialogDescription>
+              Set up a new budget with a custom name, period, and income amount.
+            </DialogDescription>
           </DialogHeader>
           
           <form onSubmit={handleSubmit}>

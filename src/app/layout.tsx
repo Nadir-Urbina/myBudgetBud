@@ -6,7 +6,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Suspense } from "react";
-import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 
 const inter = Inter({ subsets: ["latin"] });
 
