@@ -9,7 +9,6 @@ import { Menu, X, LogOut, Wallet, PieChart, Settings, Sun, Moon } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PageTransition } from '@/components/ui/page-transition';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useTheme } from '@/providers/theme-provider';
@@ -225,9 +224,7 @@ export default function DashboardLayoutClient({
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-16" ref={mainContentRef}>
-          <PageTransition>
-            {children}
-          </PageTransition>
+          {children}
         </main>
       </div>
     </div>

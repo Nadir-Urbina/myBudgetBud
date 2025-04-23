@@ -1,0 +1,25 @@
+/* Disable all animations and transitions for better performance */
+* {
+  transition: none !important;
+  animation: none !important;
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+}
+
+/* Ensure smooth scrolling is disabled */
+html {
+  scroll-behavior: auto !important;
+}
+
+/* Remove transition delays */
+*::before,
+*::after {
+  transition: none !important;
+}
+
+/* Force hardware acceleration but disable animations */
+.force-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+} 
