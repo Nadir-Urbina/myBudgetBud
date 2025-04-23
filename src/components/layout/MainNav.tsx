@@ -220,10 +220,13 @@ export function MainNav() {
           <Link
             key={route.href}
             href={route.href}
+            prefetch={true}
+            scroll={true}
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary",
               route.active ? "text-primary font-semibold" : "text-muted-foreground"
             )}
+            aria-current={route.active ? "page" : undefined}
           >
             {route.label}
           </Link>

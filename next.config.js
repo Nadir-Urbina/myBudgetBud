@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'server',
   webpack: (config, { isServer }) => {
     // Add a rule to handle the undici package
     config.module.rules.push({

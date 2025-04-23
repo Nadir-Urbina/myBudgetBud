@@ -70,12 +70,14 @@ export function SidebarNav() {
                 "h-11 px-4",
                 pathname === item.path ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               )}
-              onClick={() => handleNavItemClick(item.path)}
+              asChild
             >
-              <span className="flex items-center gap-3">
-                {item.icon}
-                {item.label}
-              </span>
+              <Link href={item.path} prefetch={true}>
+                <span className="flex items-center gap-3">
+                  {item.icon}
+                  {item.label}
+                </span>
+              </Link>
             </Button>
           ))}
         </div>
