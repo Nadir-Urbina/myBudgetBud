@@ -32,6 +32,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Simple standalone theme toggle component
 function ThemeToggle() {
@@ -79,6 +80,7 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const { user, loading } = useAuth();
   
   // Refs for DOM elements
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -208,27 +210,32 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto pt-16 md:pt-20 pb-20 md:pb-24 px-4 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-950/10 dark:to-transparent">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-6">
-            Your Personal Budget Companion
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-foreground/95 drop-shadow-sm">
-            Take control of your finances with{' '}
-            <span className="text-primary">MyBudgetPal</span>
+      <section className="container mx-auto py-24 px-4 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-500 leading-tight">
+            Take control of your <br className="hidden sm:block" />
+            personal finances
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
             Track expenses, set budgets, and reach your financial goals with our intuitive and easy-to-use personal finance tool.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup">
-              <Button size="lg" className="gap-2 w-full sm:w-auto px-8 py-6 text-base hover:bg-primary/90 transition-all hover:shadow-md">
-                Start 30-day free trial <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/signin">
+            {!user ? (
+              <Link href="/signup">
+                <Button size="lg" className="gap-2 w-full sm:w-auto px-8 py-6 text-base hover:bg-primary/90 transition-all hover:shadow-md">
+                  Start 30-day free trial <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/dashboard">
+                <Button size="lg" className="gap-2 w-full sm:w-auto px-8 py-6 text-base hover:bg-primary/90 transition-all hover:shadow-md">
+                  Go to Dashboard <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            )}
+            <Link href={user ? "/dashboard" : "/signin"}>
               <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 py-6 text-base hover:bg-accent transition-all">
-                Learn More
+                {user ? "Go to your Dashboard" : "Learn More"}
               </Button>
             </Link>
           </div>
@@ -598,9 +605,9 @@ export default function LandingPage() {
                 Start 30-day free trial <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/signin">
+            <Link href={user ? "/dashboard" : "/signin"}>
               <Button size="lg" variant="outline" className="px-8 py-6 text-base hover:bg-accent transition-all">
-                Learn More
+                {user ? "Go to your Dashboard" : "Learn More"}
               </Button>
             </Link>
           </div>
