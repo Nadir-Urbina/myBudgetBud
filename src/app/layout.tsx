@@ -34,10 +34,8 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider
-          attribute="class"
           defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
+          storageKey="theme"
         >
           <AuthProvider>
             <Suspense fallback={<div>Loading...</div>}>
